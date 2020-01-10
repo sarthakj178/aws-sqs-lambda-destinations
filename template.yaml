@@ -1,0 +1,51 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+    aws-sqs-lambda-destinations 
+     Lambda function using an SQS Queue as the trigger and SQS queues as destinations
+
+Globals:
+    Function:
+        Timeout: 10
+
+Resources:
+    # SNS Topic to receive a message on failed Lambda execution
+    OnFailureDestinationSNSTopic:
+        Type: AWS::SNS::Topic
+        Properties:
+            TopicName: 'OnFailureDestinationSNSTopic'
+
+    SnsSubscription:
+        Type: AWS::SNS::Subscription
+        Properties:
+            Endpoint: sarthakj178@gmail.com
+            Protocol: email
+            TopicArn: !Ref OnFailureDestinationSNSTopic
+
+    # SQS Queue to receive a message on successful Lambda execution
+    OnSuccessDestinationSQSQueue:
+        Type: AWS::SQS::Queue
+
+    # Lambda function
+    PingFunction:
+        Type: AWS::Serverless::Function
+        Properties:
+            Handler: index.ping
+            Runtime: nodejs10.x
+            Policies:
+                - AmazonSQSFullAccess
+                - AmazonSNSFullAccess
+
+    # Condigure Destinations for the Lambda function
+    EventInvokeConfig:
+        Type: AWS::Lambda::EventInvokeConfig
+        Properties:
+            FunctionName: !Ref PingFunction
+            Qualifier: '$LATEST'
+            MaximumEventAgeInSeconds: 60
+            MaximumRetryAttempts: 0
+            DestinationConfig:
+                OnFailure:
+                    Destination: !Ref OnFailureDestinationSNSTopic
+                OnSuccess:
+                    Destination: !GetAtt OnSuccessDestinationSQSQueue.Arn

@@ -1,0 +1,16 @@
+{
+    "name": "aws-sqs-lambda-destinations",
+    "version": "1.0.0",
+    "description": "Lambda function using an SQS Queue as the trigger and SQS queues as destinations",
+    "main": "index.js",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/sarthakj178/aws-sqs-lambda-destinations.git"
+    },
+    "author": "sarthakj178@gmail.com",
+    "license": "ISC",
+    "dependencies": {}
+}
